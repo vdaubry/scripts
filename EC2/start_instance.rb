@@ -3,7 +3,7 @@ require 'net/http'
 require 'net/ssh'
 
 puts "Initializing AWS conf"
-config_file = File.join(File.dirname(__FILE__), "config.yml")
+config_file = File.join(File.dirname(__FILE__), "../config.yml")
 AWS.config(YAML.load(File.read(config_file)))
 
 puts "Initiate a client in the Ireland region"
