@@ -27,7 +27,7 @@ echo "Clean repos"
 rm -Rf ../photo-downloader
 rm -Rf ../downloader-conf
 
-ssh deploy@54.72.162.77 'cd /srv/www/photo-downloader/current; nohup ruby scripts/start_download.rb $1 >> log/download.log 2>> log/download.log < /dev/null &'
+ssh deploy@54.72.162.77 'cd /srv/www/photo-downloader/current; nohup bundle exec ruby scripts/start_download.rb >> log/download.log 2>> log/download.log < /dev/null &'
 
 
 ##############################
