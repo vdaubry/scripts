@@ -12,7 +12,7 @@ group = ec2.security_groups['sg-e64cad83']
 
 puts "Request instance"
 request = ec2.instances.create(
-:image_id => 'ami-c767a1b0',
+:image_id => 'ami-a5c203d2',
 :instance_type => 't1.micro',
 :count => 1,
 :security_groups => group, 
