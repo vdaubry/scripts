@@ -1,5 +1,5 @@
 app_path = '/srv/www/photo-downloader/current'
-num_workers = 4
+num_workers = 2
  
 God.pid_file_directory = '/home/deploy/god/pids'
 
@@ -17,7 +17,7 @@ num_workers.times do |num|
     # restart if memory gets too high
     w.transition(:up, :restart) do |on|
       on.condition(:memory_usage) do |c|
-        c.above = 125.megabytes
+        c.above = 250.megabytes
         c.times = 2
       end
     end
