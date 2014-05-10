@@ -40,7 +40,7 @@ echo "Deploy downloader to EC2"
 cd /home/ubuntu/tmp/photo-downloader
 cap production deploy
 
-ssh -oStrictHostKeyChecking=no deploy@54.72.162.77 'cd /srv/www/photo-downloader/current; nohup bundle exec ruby scripts/start_download.rb >> log/download.log 2>> log/download.log < /dev/null &'
+ssh -oStrictHostKeyChecking=no deploy@54.72.162.77 'nohup god -c /home/deploy/god/downloader.god.rb -D >> /home/deploy/god/log/god.log 2>> /home/deploy/god/log/god.log < /dev/null &'
 
 
 ##############################
