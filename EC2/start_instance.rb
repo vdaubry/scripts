@@ -29,7 +29,7 @@ puts "Request successfull, instance id is : #{instance.id}"
 puts "Associate elastic ip to instance"
 ip = ec2.elastic_ips.create
 instance.associate_elastic_ip(ip)
-File.open('instance.ip', 'w') do |f|
+File.open("#{File.dirname(__FILE__)}/instance.ip", 'w') do |f|
   f.write(ip.to_s)
 end
 
