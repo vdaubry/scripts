@@ -14,6 +14,7 @@ cp scripts-conf/config.yml /home/ubuntu/scripts/config.yml
 
 echo "Request EC2 instance"
 ruby /home/ubuntu/scripts/EC2/start_instance.rb
+IP=`cat /home/ubuntu/scripts/EC2/instance.ip`
 
 echo "Clean repos"
 rm -Rf scripts-conf
@@ -33,14 +34,17 @@ echo "Copy private conf"
 cp /home/ubuntu/tmp/downloader-conf/*.yml /home/ubuntu/tmp/photo-downloader/private-conf/
 cp /home/ubuntu/tmp/downloader-conf/.env /home/ubuntu/tmp/photo-downloader/private-conf/
 
+echo "Copy instance ip"
+cp /home/ubuntu/scripts/EC2/instance.ip /home/ubuntu/tmp/photo-downloader/config/instance.ip
+
 echo "remove hold ssh host key"
-ssh-keygen -R 54.72.162.77
+ssh-keygen -R $IP
 
 echo "Deploy downloader to EC2"
 cd /home/ubuntu/tmp/photo-downloader
 cap production deploy
 
-ssh -oStrictHostKeyChecking=no deploy@54.72.162.77 'nohup god -c /home/deploy/god/downloader.god.rb -D >> /home/deploy/god/log/god.log 2>> /home/deploy/god/log/god.log < /dev/null &'
+ssh -oStrictHostKeyChecking=no deploy@$IP 'nohup god -c /home/deploy/god/downloader.god.rb -D >> /home/deploy/god/log/god.log 2>> /home/deploy/god/log/god.log < /dev/null &'
 
 
 ##############################
@@ -57,13 +61,15 @@ echo "Copy private conf"
 cp /home/ubuntu/tmp/scrapper-conf/*.yml /home/ubuntu/tmp/photo-scrapper/private-conf/
 cp /home/ubuntu/tmp/scrapper-conf/.env /home/ubuntu/tmp/photo-scrapper/private-conf/
 
+echo "Copy instance ip"
+cp /home/ubuntu/scripts/EC2/instance.ip /home/ubuntu/tmp/photo-scrapper/config/instance.ip
+
 echo "remove hold ssh host key"
-ssh-keygen -R 54.72.162.77
+ssh-keygen -R $IP
 
 echo "Deploy scrapper to EC2"
 cd /home/ubuntu/tmp/photo-scrapper
 cap production deploy
-
 
 echo "Clean files"
 rm -Rf /home/ubuntu/tmp

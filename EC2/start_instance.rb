@@ -27,9 +27,13 @@ instance = ec2.instances[request.instance_id]
 
 puts "Request successfull, instance id is : #{instance.id}"
 puts "Associate elastic ip to instance"
-ip = ec2.elastic_ips.first
+ip = ec2.elastic_ips.create
 instance.associate_elastic_ip(ip)
+File.open('instance.ip', 'w') do |f|
+  f.write(ip.to_s)
+end
 
+wait_time=40
 puts "Instance ready at address : #{instance.ip_address}"
-puts "Waiting 30sec to be able to ssh..."
-30.times { print "."; sleep(1)}
+puts "Waiting #{wait_time}sec to be able to ssh..."
+wait_time.times { print "."; sleep(1)}
