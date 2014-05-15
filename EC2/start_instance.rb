@@ -8,14 +8,13 @@ AWS.config(YAML.load(File.read(config_file)))
 
 puts "Initiate a client in the Ireland region"
 ec2 = AWS::EC2.new(:ec2_endpoint => 'ec2.eu-west-1.amazonaws.com')
-group = ec2.security_groups['sg-e64cad83']
 
 puts "Request instance"
 request = ec2.instances.create(
 :image_id => 'ami-4bca0b3c',
 :instance_type => 't1.micro',
 :count => 1,
-:security_groups => group, 
+:security_groups => ec2.security_groups['sg-e64cad83'], 
 :key_pair => ec2.key_pairs['paulette_ec2'],
 :instance_initiated_shutdown_behavior => "terminate")
 while request.status == :pending do
@@ -24,10 +23,13 @@ while request.status == :pending do
 end
 Raise "Request failed, instance status is #{request.status}" if request.status != :running
 instance = ec2.instances[request.instance_id]
-
 puts "Request successfull, instance id is : #{instance.id}"
-puts "Associate elastic ip to instance"
+
+puts "create new elastic ip (max 5)"
+ec2.elastic_ips.to_a.last.delete if ec2.elastic_ips.count >= 5
 ip = ec2.elastic_ips.create
+
+puts "Associate elastic ip to instance"
 instance.associate_elastic_ip(ip)
 File.open("#{File.dirname(__FILE__)}/instance.ip", 'w') do |f|
   f.write(ip.to_s)
