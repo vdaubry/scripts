@@ -26,25 +26,25 @@ rm -Rf scripts-conf
 #
 ##############################
 
-echo "Cloning downloader repos"
-git clone git@github.com:vdaubry/photo-downloader.git /home/ubuntu/tmp/photo-downloader
-git clone git@92.222.1.55:/home/git/downloader-conf.git /home/ubuntu/tmp/downloader-conf
+# echo "Cloning downloader repos"
+# git clone git@github.com:vdaubry/photo-downloader.git /home/ubuntu/tmp/photo-downloader
+# git clone git@92.222.1.55:/home/git/downloader-conf.git /home/ubuntu/tmp/downloader-conf
 
-echo "Copy private conf"
-cp /home/ubuntu/tmp/downloader-conf/*.yml /home/ubuntu/tmp/photo-downloader/private-conf/
-cp /home/ubuntu/tmp/downloader-conf/.env /home/ubuntu/tmp/photo-downloader/private-conf/
+# echo "Copy private conf"
+# cp /home/ubuntu/tmp/downloader-conf/*.yml /home/ubuntu/tmp/photo-downloader/private-conf/
+# cp /home/ubuntu/tmp/downloader-conf/.env /home/ubuntu/tmp/photo-downloader/private-conf/
 
-echo "Copy instance ip"
-cp /home/ubuntu/scripts/EC2/instance.ip /home/ubuntu/tmp/photo-downloader/config/instance.ip
+# echo "Copy instance ip"
+# cp /home/ubuntu/scripts/EC2/instance.ip /home/ubuntu/tmp/photo-downloader/config/instance.ip
 
-echo "remove hold ssh host key"
-ssh-keygen -R $IP
+# echo "remove hold ssh host key"
+# ssh-keygen -R $IP
 
-echo "Deploy downloader to EC2"
-cd /home/ubuntu/tmp/photo-downloader
-cap production deploy
+# echo "Deploy downloader to EC2"
+# cd /home/ubuntu/tmp/photo-downloader
+# cap production deploy
 
-ssh -oStrictHostKeyChecking=no deploy@$IP 'nohup god -c /home/deploy/god/downloader.god.rb -D >> /home/deploy/god/log/god.log 2>> /home/deploy/god/log/god.log < /dev/null &'
+# ssh -oStrictHostKeyChecking=no deploy@$IP 'nohup god -c /home/deploy/god/downloader.god.rb -D >> /home/deploy/god/log/god.log 2>> /home/deploy/god/log/god.log < /dev/null &'
 
 
 ##############################
