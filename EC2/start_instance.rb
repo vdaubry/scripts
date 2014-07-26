@@ -12,7 +12,7 @@ ec2 = AWS::EC2.new(:ec2_endpoint => 'ec2.eu-west-1.amazonaws.com')
 puts "Request instance"
 request = ec2.instances.create(
 :image_id => 'ami-4bca0b3c',
-:instance_type => 't2.micro',
+:instance_type => 't1.micro',
 :count => 1,
 :security_groups => ec2.security_groups['sg-e64cad83'], 
 :key_pair => ec2.key_pairs['paulette_ec2'],
