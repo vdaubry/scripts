@@ -75,3 +75,5 @@ cap production deploy
 
 echo "Clean files"
 rm -Rf /home/ubuntu/tmp
+
+ssh -oStrictHostKeyChecking=no deploy@$IP 'cd /srv/www/photo-scrapper/current; nohup ruby scrappers/run_scrapping.rb >> log/scrapping.log 2>> log/scrapping.log < /dev/null &'
