@@ -15,7 +15,7 @@ request = ec2.instances.create(
 :instance_type => 't1.micro',
 :count => 1,
 :security_groups => ec2.security_groups['sg-e64cad83'], 
-:key_pair => ec2.key_pairs['paulette_ec2'],
+:key_pair => ec2.key_pairs['pauletteEC2'],
 :instance_initiated_shutdown_behavior => "terminate")
 while request.status == :pending do
   puts "Waiting for instance initialization, status = #{request.status}"
