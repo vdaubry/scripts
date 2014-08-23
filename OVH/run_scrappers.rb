@@ -21,14 +21,19 @@ sqs = AWS::SQS.new
 
 scrappers = []
 
-#Scrap forums
-(1..5).each { |i| scrappers << "forum#{i}" }
+if ARGV[0]
+  scrappers << ARGV[0]
+else 
+  #Scrap forums
+  (1..5).each { |i| scrappers << "forum#{i}" }
 
-#Scrap websites
-(1..2).each { |i| scrappers << "website#{i}" }
+  #Scrap websites
+  (1..2).each { |i| scrappers << "website#{i}" }
 
-#Scrap tumblrs
-(1..9).each { |i| scrappers << "tumblr#{i}" }
+  #Scrap tumblrs
+  (1..9).each { |i| scrappers << "tumblr#{i}" }
+end
+
 
 scrappers.each do |key| 
   json = {:website_key => key}.to_json
