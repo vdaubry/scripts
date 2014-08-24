@@ -1,7 +1,7 @@
 require 'aws-sdk'
 require 'yaml'
 
-conf = YAML.load_file("../config.yml")
+conf = YAML.load_file(File.expand_path(File.dirname(__FILE__))+"/../config.yml")
     
 AWS.config({
   :access_key_id => conf["access_key_id"],
@@ -39,6 +39,3 @@ scrappers.each do |key|
   json = {:website_key => key}.to_json
   @queue.send_message("#{json}")
 end
-
-
-
