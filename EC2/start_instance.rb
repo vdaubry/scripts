@@ -1,41 +1,55 @@
 require 'aws-sdk'
-require 'net/http'
-require 'net/ssh'
 
 puts "Initializing AWS conf"
-config_file = File.join(File.dirname(__FILE__), "../config.yml")
-AWS.config(YAML.load(File.read(config_file)))
+Aws.config.update({
+  region: 'us-west-2',
+  credentials: Aws::Credentials.new(ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'])
+})
 
 puts "Initiate a client in the Ireland region"
-ec2 = AWS::EC2.new(:ec2_endpoint => 'ec2.eu-west-1.amazonaws.com')
+ec2 = Aws::EC2::Client.new(region: 'eu-west-1')
 
 puts "Request instance"
-request = ec2.instances.create(
-:image_id => 'ami-4bca0b3c',
-:instance_type => 't1.micro',
-:count => 1,
-:security_groups => ec2.security_groups['sg-e64cad83'], 
-:key_pair => ec2.key_pairs['pauletteEC2'],
-:instance_initiated_shutdown_behavior => "terminate")
-while request.status == :pending do
-  puts "Waiting for instance initialization, status = #{request.status}"
-  sleep 1 
-end
-Raise "Request failed, instance status is #{request.status}" if request.status != :running
-instance = ec2.instances[request.instance_id]
-puts "Request successfull, instance id is : #{instance.id}"
+instance_request = ec2.run_instances(
+  image_id: 'ami-47a23a30',
+  instance_type: 't2.micro',
+  min_count: 1,
+  max_count: 1,
+  key_name: "youboox_EC2_deploy",
+  security_group_ids: ["sg-cec494ab"],
+  instance_initiated_shutdown_behavior: "terminate",
+  subnet_id: "subnet-7e718809",
+  block_device_mappings: [
+    {
+      device_name: "/dev/sda1",
+      ebs: {
+        volume_size: 60
+      }
+    }
+  ])
 
-puts "create new elastic ip (max 5)"
-ec2.elastic_ips.to_a.last.delete if ec2.elastic_ips.count >= 5
-ip = ec2.elastic_ips.create
+instance_id = instance_request.instances.first.instance_id
 
-puts "Associate elastic ip to instance"
-instance.associate_elastic_ip(ip)
-File.open("#{File.dirname(__FILE__)}/instance.ip", 'w') do |f|
-  f.write(ip.to_s)
+wait_timeout = 60
+puts "Waiting for instance to start, timeout = #{wait_timeout}"
+begin
+  ec2.wait_until(:instance_running, instance_ids:[instance_id]) do |w|
+    w.max_attempts = 10
+    w.interval = wait_timeout/10
+    
+    w.before_attempt do |n|
+      puts "Instance not running yet, attempt n° #{n}, next attempt in #{wait_timeout/10} sec"
+    end
+  end
+rescue Aws::Waiters::Errors::WaiterFailed
+  puts "Instance start timeout"
+  exit
 end
+puts "Instance request successfull, instance id is : #{instance_id}"
+
+public_dns = ec2.describe_instances(instance_ids: [instance_id])[0][0].instances[0].public_dns_name
+puts "Instance public dns is : #{public_dns}"
 
 wait_time=40
-puts "Instance ready at address : #{instance.ip_address}"
-puts "Waiting #{wait_time}sec to be able to ssh..."
+puts "Waiting for instance boot to finish"
 wait_time.times { print "."; sleep(1)}
